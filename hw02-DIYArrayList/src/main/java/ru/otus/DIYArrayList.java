@@ -13,8 +13,9 @@ public class DIYArrayList<E> implements List<E> {
     // mandatory methods
     @Override
     public boolean add(E e) {
-        if (lastIndex == objectArray.length - 1)
+        if (lastIndex == objectArray.length - 1) {
             expand();
+        }
         objectArray[++lastIndex] = e;
         return true;
     }
@@ -37,13 +38,17 @@ public class DIYArrayList<E> implements List<E> {
     @Override
     public int indexOf(Object o) {
         if (o == null) {
-            for (int i = 0; i <= lastIndex; i++)
-                if (objectArray[i] == null)
+            for (int i = 0; i <= lastIndex; i++) {
+                if (objectArray[i] == null) {
                     return i;
+                }
+            }
         } else {
-            for (int i = 0; i <= lastIndex; i++)
-                if (o.equals(objectArray[i]))
+            for (int i = 0; i <= lastIndex; i++) {
+                if (o.equals(objectArray[i])) {
                     return i;
+                }
+            }
         }
         return -1;
     }
@@ -51,13 +56,17 @@ public class DIYArrayList<E> implements List<E> {
     @Override
     public int lastIndexOf(Object o) {
         if (o == null) {
-            for (int i = lastIndex; i >= 0; i--)
-                if (objectArray[i] == null)
+            for (int i = lastIndex; i >= 0; i--) {
+                if (objectArray[i] == null) {
                     return i;
+                }
+            }
         } else {
-            for (int i = lastIndex; i >= 0; i--)
-                if (o.equals(objectArray[i]))
+            for (int i = lastIndex; i >= 0; i--) {
+                if (o.equals(objectArray[i])) {
                     return i;
+                }
+            }
         }
         return -1;
     }
@@ -97,17 +106,6 @@ public class DIYArrayList<E> implements List<E> {
     }
 
     @Override
-    public boolean remove(Object o) {
-        notImplemented();
-        int pos = indexOf(o);
-        if (pos > -1) {
-            remove(pos);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public E remove(int index) {
         checkIndex(index);
@@ -133,6 +131,12 @@ public class DIYArrayList<E> implements List<E> {
     }
 
     // not implemented =============================
+
+    @Override
+    public boolean remove(Object o) {
+        notImplemented();
+        return false;
+    }
 
     @Override
     public void add(int index, E element) {
@@ -188,8 +192,9 @@ public class DIYArrayList<E> implements List<E> {
     }
 
     private void checkIndex(int index) {
-        if (index < 0 || index > lastIndex)
+        if (index < 0 || index > lastIndex) {
             throw new IndexOutOfBoundsException("Index out of range");
+        }
     }
 
     private void notImplemented() {
@@ -210,14 +215,16 @@ public class DIYArrayList<E> implements List<E> {
 
         @SuppressWarnings("unchecked")
         public E next() {
-            if (currentPos > lastIndex)
+            if (currentPos > lastIndex) {
                 throw new NoSuchElementException();
+            }
             return (E) objectArray[lastRet = currentPos++];
         }
 
         public void remove() {
-            if (lastRet < 0)
+            if (lastRet < 0) {
                 throw new IllegalStateException();
+            }
             DIYArrayList.this.remove(lastRet);
             currentPos = lastRet;
             lastRet = -1;
@@ -245,14 +252,16 @@ public class DIYArrayList<E> implements List<E> {
 
         @SuppressWarnings("unchecked")
         public E previous() {
-            if (currentPos <= 0)
+            if (currentPos <= 0) {
                 throw new NoSuchElementException();
+            }
             return (E) objectArray[lastRet = --currentPos];
         }
 
         public void set(E e) {
-            if (lastRet < 0)
+            if (lastRet < 0) {
                 throw new IllegalStateException();
+            }
             DIYArrayList.this.set(lastRet, e);
         }
 

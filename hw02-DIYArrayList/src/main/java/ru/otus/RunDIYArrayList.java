@@ -63,8 +63,9 @@ public class RunDIYArrayList {
 
         // double DIYArrayList
         DIYArrayList<Double> doubleDIYArrayList = new DIYArrayList<>();
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++) {
             doubleDIYArrayList.add(randomDouble());
+        }
 
         // + 30 numbers else
         Collections.addAll(doubleDIYArrayList,
@@ -86,8 +87,9 @@ public class RunDIYArrayList {
 
         // Long DIYArrayList
         DIYArrayList<Long> longDIYArrayList = new DIYArrayList<>();
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 50; i++) {
             longDIYArrayList.add(randomLong6());
+        }
 
         // + 30 numbers else
         Collections.addAll(longDIYArrayList,
@@ -107,16 +109,18 @@ public class RunDIYArrayList {
     }
 
     private static <T> List<T> createEmptyArrayList(int size) {
-    List<T> result = new ArrayList<>(size);
-        for (int i = 0; i < size; i++)
+        List<T> result = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             result.add(null);
+        }
         return result;
     }
 
     private static <T> void printAnyArrayList(List<T> arrayList) {
         int i = 0;
-        for (T obj : arrayList)
-            System.out.println("" + (i++) + ": "+ obj.toString());
+        for (T obj : arrayList) {
+            System.out.println("" + (i++) + ": " + obj.toString());
+        }
     }
 
     private static Double randomDouble() {
