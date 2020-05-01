@@ -13,11 +13,11 @@ public class MyTestsRunner {
     private static int successTestCount = 0;
     private static int failedTestCount = 0;
 
-    public static void runMyTests(String className) {
+    public static void runMyTests(String className) throws ClassNotFoundException {
 
         Class<?> clazz = getTestClass(className);
         if (clazz == null) {
-            return;
+            throw new ClassNotFoundException(className);
         }
 
         List<Method> methodsBefore = new ArrayList<>();
