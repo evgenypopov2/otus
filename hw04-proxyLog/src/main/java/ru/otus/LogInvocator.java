@@ -1,6 +1,5 @@
 package ru.otus;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -63,8 +62,5 @@ public class LogInvocator {
             }
             return result;
         }
-    }
-
-    private static void addAnnotatedMethod(Method method, Annotation annotation, List<Method> methodList, Class<?> annotationClass) {
     }
 }
