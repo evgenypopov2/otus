@@ -3,33 +3,25 @@ package ru.otus;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class LogInvocator {
 
-    private static List<Method> loggingMethods;
+    private static Set<Method> loggingMethods;
 
     private LogInvocator() {
     }
 
-    static Class4Logging createLoggingClass() {
+    static Class4Logging createLoggingClass() throws NoSuchMethodException {
 
-        loggingMethods = new ArrayList<>();
+        loggingMethods = new HashSet<>();
 
-        Arrays.stream(Class4LoggingImpl.class.getDeclaredMethods()).forEach(method -> {
-            Arrays.stream(method.getDeclaredAnnotations()).forEach(annotation -> {
-                if (annotation.annotationType().equals(Log.class)) {
-                    try {
-                        Method mm = Class4Logging.class.getMethod(method.getName(), method.getParameterTypes());
-                        loggingMethods.add(mm);
-                    } catch (NoSuchMethodException e) {
-                        ; // dont know what to do - so what?
-                    }
-                }
-            });
-        });
+        for (Method method : Class4LoggingImpl.class.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Log.class)) {
+                Method interfaceMethod = Class4Logging.class.getMethod(method.getName(), method.getParameterTypes());
+                loggingMethods.add(interfaceMethod);
+            }
+        }
 
         InvocationHandler handler = new LogInvocationHandler(new Class4LoggingImpl());
         return (Class4Logging) Proxy.newProxyInstance(LogInvocator.class.getClassLoader(),

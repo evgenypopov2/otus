@@ -1,7 +1,7 @@
 package ru.otus;
 
 public class LogProxyRunner {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchMethodException {
         Class4Logging loggingClass = LogInvocator.createLoggingClass();
         loggingClass.method4Logging1(345, "String Parameter 1");
         loggingClass.notLoggingMethod();
