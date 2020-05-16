@@ -3,4 +3,5 @@ include 'hw01-gradle'
 include 'hw02-DIYArrayList'
 include 'hw03-Test'
 include 'hw04-proxyLog'
+include 'hw06-atm'
 
