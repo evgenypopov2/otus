@@ -27,26 +27,23 @@ public class Cell {
         return banknoteCount;
     }
 
-    public boolean putBanknotes(int banknotesToPutCount) throws NotEnoughSpaceException {
-        if (banknoteCount + banknotesToPutCount <= capacity) {
+    public void putBanknotes(int banknotesToPutCount) {
+        if (canReceive(banknotesToPutCount)) {
             banknoteCount += banknotesToPutCount;
-            return true;
         }
-        throw new NotEnoughSpaceException("No space to put banknotes");
     }
 
-    public int getBanknotes(int banknotesToGetCount) {
-
-        int banknotesProvided = banknotesToGetCount;
-
-        if (banknoteCount >= banknotesToGetCount) {
+    public void getBanknotes(int banknotesToGetCount) {
+        if (canProvide(banknotesToGetCount)) {
             banknoteCount -= banknotesToGetCount;
-        } else if (banknoteCount > 0) {
-            banknotesProvided = banknoteCount;
-            banknoteCount = 0;
-        } else {
-            banknotesProvided = 0;
         }
-        return banknotesProvided;
+    }
+
+    public boolean canProvide(int banknotesToGetCount) {
+        return banknoteCount >= banknotesToGetCount;
+    }
+
+    public boolean canReceive(int banknotesToPutCount) {
+        return banknoteCount + banknotesToPutCount <= capacity;
     }
 }

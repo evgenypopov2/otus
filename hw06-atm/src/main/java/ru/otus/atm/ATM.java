@@ -12,41 +12,52 @@ public class ATM {
 
     private static final int CELLS_CAPACITY = 1000;
 
-    List<Cell> cells = new ArrayList<>();
+    private List<Cell> cells = new ArrayList<>();
 
     public ATM() {
         // sort by nominal value desc
-        Stream.of(Nominal.values()).sorted(Comparator.comparingInt(Nominal::getValue).reversed()).forEach(nominal -> cells.add(new Cell(nominal, CELLS_CAPACITY)));
+        Stream.of(Nominal.values())
+                .sorted(Comparator.comparingInt(Nominal::getValue).reversed())
+                .forEach(nominal -> cells.add(new Cell(nominal, CELLS_CAPACITY)));
     }
 
-    public void putMoney(EnumMap<Nominal, Integer> moneyPack) throws NotEnoughSpaceException {
+    public void putMoney(Map<Nominal, Integer> moneyPack) throws NotEnoughSpaceException {
 
-        for (Cell cell: cells) {
+        for (Cell cell: cells) {   // check possibility first
+            Integer banknotesNumber = moneyPack.get(cell.getNominal());
+            if (banknotesNumber != null && banknotesNumber > 0) {
+                if (!cell.canReceive(banknotesNumber)) {
+                    throw new NotEnoughSpaceException("No space to put banknotes: " + cell.getNominal());
+                }
+            }
+        }
+        // start transaction
+        cells.forEach(cell -> {
             Integer banknotesNumber = moneyPack.get(cell.getNominal());
             if (banknotesNumber != null && banknotesNumber > 0) {
                 cell.putBanknotes(banknotesNumber);
             }
-        }
+        });
+        // commit transaction
     }
 
     public void getMoney(int sum0) throws CannotProvideRequestedSumException {
 
-        int sum = sum0;
-        EnumMap<Nominal, Integer> moneyPack = new EnumMap<>(Nominal.class);
+        int[] sum = new int[1];
+        sum[0] = sum0;
+        var moneyPack = new EnumMap<Nominal, Integer>(Nominal.class);
 
-        for (Cell cell: cells) {    // check possibility first
+        cells.forEach(cell -> {    // check possibility first
             int nominal = cell.getNominal().getValue();
 
-            if (nominal <= sum && cell.getBanknoteCount() > 0) {
-                int banknotes = Math.min(sum / nominal, cell.getBanknoteCount());
+            if (nominal <= sum[0] && cell.getBanknoteCount() > 0) {
+                int banknotes = Math.min(sum[0] / nominal, cell.getBanknoteCount());
                 moneyPack.put(cell.getNominal(), banknotes);
-                sum -= (banknotes * nominal);
-//            } else {
-//                moneyPack.put(cell.getNominal(), 0);
+                sum[0] -= (banknotes * nominal);
             }
-        }
+        });
 
-        if (sum > 0) {
+        if (sum[0] > 0) {
             throw new CannotProvideRequestedSumException("Can not provide requested sum " + sum0);
         }
 
@@ -60,18 +71,23 @@ public class ATM {
         // commit transaction
     }
 
-    public String getState() {
+    public String getCellsState() {
 
         StringBuilder stringBuilder = new StringBuilder("[");
-        int[] sum = new int[1];
 
-        cells.forEach(cell -> {
-            stringBuilder.append(stringBuilder.length() > 1 ? ", " : "")
-                    .append(cell.getNominal().getValue()).append(": ").append(cell.getBanknoteCount());
-            sum[0] += (cell.getNominal().value * cell.getBanknoteCount());
-        });
-        stringBuilder.append("], Remainder: ").append(sum[0]);
+        cells.forEach(cell -> stringBuilder
+                .append(stringBuilder.length() > 1 ? ", " : "")
+                .append(cell.getNominal().getValue())
+                .append(": ")
+                .append(cell.getBanknoteCount()));
 
+        stringBuilder.append("]");
         return stringBuilder.toString();
+    }
+
+    public int getRemainedSum() {
+        return cells.stream()
+                .mapToInt(cell -> cell.getNominal().getValue() * cell.getBanknoteCount())
+                .reduce(Integer::sum).orElse(0);
     }
 }
