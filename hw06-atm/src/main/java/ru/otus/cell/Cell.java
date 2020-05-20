@@ -1,7 +1,6 @@
 package ru.otus.cell;
 
 import ru.otus.banknote.Nominal;
-import ru.otus.exception.NotEnoughSpaceException;
 
 // ячейка банкомата
 public class Cell {

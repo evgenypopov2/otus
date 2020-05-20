@@ -25,10 +25,8 @@ public class ATM {
 
         for (Cell cell: cells) {   // check possibility first
             Integer banknotesNumber = moneyPack.get(cell.getNominal());
-            if (banknotesNumber != null && banknotesNumber > 0) {
-                if (!cell.canReceive(banknotesNumber)) {
-                    throw new NotEnoughSpaceException("No space to put banknotes: " + cell.getNominal());
-                }
+            if (banknotesNumber != null && banknotesNumber > 0 &&!cell.canReceive(banknotesNumber)) {
+                throw new NotEnoughSpaceException("No space to put banknotes: " + cell.getNominal());
             }
         }
         // start transaction
