@@ -11,6 +11,7 @@ public class CoolObject {
     private long longAttr;
     private char charAttr;
     private String stringAttr;
+    private String nullAttr = null;
     private boolean[] boolArray;
     private int[] intArray;
     private long[] longArray;

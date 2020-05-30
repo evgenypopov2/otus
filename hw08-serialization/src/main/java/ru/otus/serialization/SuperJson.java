@@ -17,10 +17,13 @@ public class SuperJson {
 
         for (Field field : clazz.getDeclaredFields()) {
             field.setAccessible(true);
-            result.append(result.length() > 1 ? ",\"" : "\"")
-                    .append(field.getName())
-                    .append("\":")
-                    .append(attr2Json(field.get(obj)));
+            Object o = field.get(obj);
+            if (o != null) {
+                result.append(result.length() > 1 ? ",\"" : "\"")
+                        .append(field.getName())
+                        .append("\":")
+                        .append(attr2Json(o));
+            }
         }
         result.append('}');
         return result.toString();
