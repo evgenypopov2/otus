@@ -2,6 +2,7 @@ package ru.otus.serialization;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 
 public class SuperJson {
@@ -12,29 +13,7 @@ public class SuperJson {
             return "null";
         }
 
-        Class<?> clazz = obj.getClass();
-        StringBuilder result = new StringBuilder("{");
-
-        for (Field field : clazz.getDeclaredFields()) {
-            field.setAccessible(true);
-            Object o = field.get(obj);
-            if (o != null) {
-                result.append(result.length() > 1 ? ",\"" : "\"")
-                        .append(field.getName())
-                        .append("\":")
-                        .append(attr2Json(o));
-            }
-        }
-        result.append('}');
-        return result.toString();
-    }
-
-    private String attr2Json(Object obj) throws IllegalAccessException {
-
-        if (obj == null) {
-            return "null";
-        }
-
+        String result = "";
         Class<?> clazz = obj.getClass();
 
         if (clazz.equals(Boolean.class)
@@ -42,22 +21,44 @@ public class SuperJson {
                 || clazz.equals(Long.class)
                 || clazz.equals(Byte.class)
                 || clazz.equals(Short.class)
+                || clazz.equals(Float.class)
+                || clazz.equals(Double.class)
         ) {
-            return obj.toString();
+            result = obj.toString();
         } else if (clazz.equals(String.class) || clazz.equals(Character.class)) {
-            return "\"".concat(obj.toString().replace("'", "\\u0027")).concat("\"");
+            result = "\"".concat(obj.toString().replace("'", "\\u0027")).concat("\"");
         } else if (clazz.isArray()) {
-            return array2Json(obj);
+            result = array2Json(obj);
         } else if (obj instanceof Collection) {
-            return collection2Json(obj);
+            result = collection2Json(obj);
+        } else {
+            StringBuilder sb = new StringBuilder("{");
+
+            for (Field field : clazz.getDeclaredFields()) {
+                if (!Modifier.isTransient(field.getModifiers()) // not transient & not const
+                        && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
+
+                    field.setAccessible(true);
+                    Object o = field.get(obj);
+
+                    if (o != null) {
+                        sb.append(sb.length() > 1 ? ",\"" : "\"")
+                                .append(field.getName())
+                                .append("\":")
+                                .append(toJson(o));
+                    }
+                }
+            }
+            sb.append('}');
+            result = sb.toString();
         }
-        return "";
+        return result;
     }
 
     private String array2Json(Object obj) throws IllegalAccessException {
         StringBuilder result = new StringBuilder("[");
         for (int i = 0, length = Array.getLength(obj); i < length; i++) {
-            result.append(result.length() > 1 ? "," : "").append(attr2Json(Array.get(obj, i)));
+            result.append(result.length() > 1 ? "," : "").append(toJson(Array.get(obj, i)));
         }
         result.append(']');
         return result.toString();
@@ -66,7 +67,7 @@ public class SuperJson {
     private String collection2Json(Object obj) throws IllegalAccessException {
         StringBuilder result = new StringBuilder("[");
         for (Object o: (Collection) obj) {
-            result.append(result.length() > 1 ? "," : "").append(attr2Json(o));
+            result.append(result.length() > 1 ? "," : "").append(toJson(o));
         }
         result.append(']');
         return result.toString();
