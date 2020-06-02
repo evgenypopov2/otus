@@ -32,27 +32,31 @@ public class SuperJson {
         } else if (obj instanceof Collection) {
             result = collection2Json(obj);
         } else {
-            StringBuilder sb = new StringBuilder("{");
-
-            for (Field field : clazz.getDeclaredFields()) {
-                if (!Modifier.isTransient(field.getModifiers()) // not transient & not const
-                        && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
-
-                    field.setAccessible(true);
-                    Object o = field.get(obj);
-
-                    if (o != null) {
-                        sb.append(sb.length() > 1 ? ",\"" : "\"")
-                                .append(field.getName())
-                                .append("\":")
-                                .append(toJson(o));
-                    }
-                }
-            }
-            sb.append('}');
-            result = sb.toString();
+            result = object2Json(clazz, obj);
         }
         return result;
+    }
+
+    private String object2Json(Class<?> clazz, Object obj) throws IllegalAccessException {
+        StringBuilder sb = new StringBuilder("{");
+
+        for (Field field : clazz.getDeclaredFields()) {
+            if (!Modifier.isTransient(field.getModifiers()) // not transient & not const
+                    && !(Modifier.isFinal(field.getModifiers()) && Modifier.isStatic(field.getModifiers()))) {
+
+                field.setAccessible(true);
+                Object o = field.get(obj);
+
+                if (o != null) {
+                    sb.append(sb.length() > 1 ? ",\"" : "\"")
+                            .append(field.getName())
+                            .append("\":")
+                            .append(toJson(o));
+                }
+            }
+        }
+        sb.append('}');
+        return sb.toString();
     }
 
     private String array2Json(Object obj) throws IllegalAccessException {

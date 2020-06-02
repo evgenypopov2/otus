@@ -41,14 +41,14 @@ public class SuperJsonRunner {
         ));
     }
 
-    private static void compareJsons(SuperJson superJson, Gson gson, Object coolObject) throws IllegalAccessException {
+    private static void compareJsons(SuperJson superJson, Gson gson, Object obj) throws IllegalAccessException {
 
         System.out.println("===========================");
 
-        String superJsonString = superJson.toJson(coolObject);
+        String superJsonString = superJson.toJson(obj);
         System.out.println(superJsonString);
 
-        String gsonString = gson.toJson(coolObject);
+        String gsonString = gson.toJson(obj);
         System.out.println(gsonString);
 
         System.out.println(gsonString.equals(superJsonString));
