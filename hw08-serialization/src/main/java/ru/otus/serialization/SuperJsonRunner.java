@@ -2,8 +2,7 @@ package ru.otus.serialization;
 
 import com.google.gson.Gson;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class SuperJsonRunner {
 
@@ -22,7 +21,7 @@ public class SuperJsonRunner {
         compareJsons(superJson, gson, "aaa");
         compareJsons(superJson, gson, 'b');
         compareJsons(superJson, gson, new int[] {7, 8, 9});
-        compareJsons(superJson, gson, List.of(10, 11 ,12));
+        compareJsons(superJson, gson, Arrays.asList(10, 11, 12));
         compareJsons(superJson, gson, Collections.singletonList(13));
 
         // objects & arrays/collections of objects
@@ -52,5 +51,7 @@ public class SuperJsonRunner {
         System.out.println(gsonString);
 
         System.out.println(gsonString.equals(superJsonString));
+        System.out.println(gson.fromJson(superJsonString,
+                obj instanceof Collection ? ArrayList.class : obj.getClass()).toString());
     }
 }
