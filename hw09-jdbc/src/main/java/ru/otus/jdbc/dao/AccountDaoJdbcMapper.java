@@ -8,7 +8,6 @@ import ru.otus.jdbc.mapper.JdbcMapper;
 import ru.otus.jdbc.mapper.JdbcMapperImpl;
 import ru.otus.jdbc.sessionmanager.SessionManagerJdbc;
 
-import java.sql.Connection;
 import java.util.Optional;
 
 public class AccountDaoJdbcMapper implements AccountDao {
@@ -35,9 +34,5 @@ public class AccountDaoJdbcMapper implements AccountDao {
     @Override
     public SessionManager getSessionManager() {
         return sessionManager;
-    }
-
-    private Connection getConnection() {
-        return sessionManager.getCurrentSession().getConnection();
     }
 }
