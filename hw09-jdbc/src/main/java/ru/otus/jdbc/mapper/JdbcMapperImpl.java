@@ -21,10 +21,11 @@ public class JdbcMapperImpl<T> implements JdbcMapper<T> {
     private final EntityClassMetaData<T> entityClassMetaData;
     private final EntitySQLMetaData<T> entitySQLMetaData;
 
-    public JdbcMapperImpl(Class<T> clazz, SessionManagerJdbc sessionManager, DbExecutor<T> dbExecutor) throws NoSuchMethodException {
+    public JdbcMapperImpl(SessionManagerJdbc sessionManager, DbExecutor<T> dbExecutor,
+                          EntityClassMetaDataImpl<T> entityClassMetaData, EntitySQLMetaDataImpl<T> entitySQLMetaData) {
         this.dbExecutor = dbExecutor;
-        entityClassMetaData = new EntityClassMetaDataImpl<>(clazz);
-        entitySQLMetaData = new EntitySQLMetaDataImpl<>(clazz);
+        this.entityClassMetaData = entityClassMetaData;
+        this.entitySQLMetaData = entitySQLMetaData;
         this.sessionManager = sessionManager;
     }
 
@@ -108,8 +109,9 @@ public class JdbcMapperImpl<T> implements JdbcMapper<T> {
             field.setAccessible(true);
             try {
                 params.add(field.get(objectData));
-            } catch(Exception e) {
+            } catch (Exception e) {
                 logger.error(e.getMessage(), e);
+                throw new UserDaoException(e);
             }
         });
         return params;

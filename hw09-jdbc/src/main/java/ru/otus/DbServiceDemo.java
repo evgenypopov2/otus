@@ -35,8 +35,8 @@ public class DbServiceDemo {
 
         // user jdbc manipulations
         DbExecutorImpl<User> dbExecutorUser = new DbExecutorImpl<>();
-        var userDao = new UserDaoJdbc(sessionManager, dbExecutorUser);
-        var dbServiceUser = new DbServiceUserImpl(userDao);
+        var userDaoJdbc = new UserDaoJdbc(sessionManager, dbExecutorUser);
+        var dbServiceUser = new DbServiceUserImpl(userDaoJdbc);
         var id = dbServiceUser.save(new User(1, "dbServiceUser", 50));
         Optional<User> user = dbServiceUser.get(id);
         user.ifPresentOrElse(
@@ -46,8 +46,8 @@ public class DbServiceDemo {
 
         // account jdbc manipulations
         DbExecutorImpl<Account> dbExecutorAccount = new DbExecutorImpl<>();
-        var accountDao = new AccountDaoJdbc(sessionManager, dbExecutorAccount);
-        var dbServiceAccount = new DbServiceAccountImpl(accountDao);
+        var accountDaoJdbc = new AccountDaoJdbc(sessionManager, dbExecutorAccount);
+        var dbServiceAccount = new DbServiceAccountImpl(accountDaoJdbc);
         id = dbServiceAccount.save(new Account(1, "Account type", 8765.34));
         Optional<Account> account = dbServiceAccount.get(id);
         account.ifPresentOrElse(
@@ -56,7 +56,7 @@ public class DbServiceDemo {
         );
 
         // user jdbc mapper manipulations
-        UserDaoJdbcMapper userDaoJdbcMapper = new UserDaoJdbcMapper(sessionManager, dbExecutorUser);
+        var userDaoJdbcMapper = new UserDaoJdbcMapper(sessionManager, dbExecutorUser);
         dbServiceUser = new DbServiceUserImpl(userDaoJdbcMapper);
         id = dbServiceUser.save(new User(2, "User by jdbc mapper", 55));
         user = dbServiceUser.get(id);
@@ -66,7 +66,7 @@ public class DbServiceDemo {
         );
 
         // account jdbc mapper manipulations
-        AccountDaoJdbcMapper accountDaoJdbcMapper = new AccountDaoJdbcMapper(sessionManager, dbExecutorAccount);
+        var accountDaoJdbcMapper = new AccountDaoJdbcMapper(sessionManager, dbExecutorAccount);
         dbServiceAccount = new DbServiceAccountImpl(accountDaoJdbcMapper);
         id = dbServiceAccount.save(new Account(2, "AccountType by jdbc mapper", 985694.87354));
         account = dbServiceAccount.get(id);

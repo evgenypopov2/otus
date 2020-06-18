@@ -14,18 +14,23 @@ public class EntitySQLMetaDataImpl<T> implements EntitySQLMetaData<T> {
     public EntitySQLMetaDataImpl(Class<T> clazz) throws NoSuchMethodException {
         EntityClassMetaData<T> entityClassMetaData = new EntityClassMetaDataImpl<>(clazz);
 
+        selectAllSql = createSelectAllSql(entityClassMetaData);
+        selectByIdSql = createSelectByIdSql(entityClassMetaData);
+        insertSql = createInsertSql(entityClassMetaData);
+        updateSql = createUpdateSql(entityClassMetaData);
+    }
+
+    private String createSelectAllSql(EntityClassMetaData<T> entityClassMetaData) {
         StringBuilder sbQuery = new StringBuilder(START_SELECT);
         entityClassMetaData.getAllFields().forEach(field -> {
             sbQuery.append(sbQuery.length() > START_SELECT.length() ? "," : "").append(field.getName());
         });
         sbQuery.append(" from ").append(entityClassMetaData.getName());
-        selectAllSql = sbQuery.toString();
+        return sbQuery.toString();
+    }
 
-        sbQuery.append(" where ").append(entityClassMetaData.getIdField().getName()).append("=?");
-        selectByIdSql = sbQuery.toString();
-
-        insertSql = createInsertSql(entityClassMetaData);
-        updateSql = createUpdateSql(entityClassMetaData);
+    private String createSelectByIdSql(EntityClassMetaData<T> entityClassMetaData) {
+        return selectAllSql.concat(" where ").concat(entityClassMetaData.getIdField().getName()).concat("=?");
     }
 
     private String createInsertSql(EntityClassMetaData<T> entityClassMetaData) {

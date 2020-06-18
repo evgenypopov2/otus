@@ -1,9 +1,12 @@
 package ru.otus.jdbc.dao;
 
 import ru.otus.core.dao.UserDao;
+import ru.otus.core.model.Account;
 import ru.otus.core.model.User;
 import ru.otus.core.sessionmanager.SessionManager;
 import ru.otus.jdbc.DbExecutorImpl;
+import ru.otus.jdbc.mapper.EntityClassMetaDataImpl;
+import ru.otus.jdbc.mapper.EntitySQLMetaDataImpl;
 import ru.otus.jdbc.mapper.JdbcMapper;
 import ru.otus.jdbc.mapper.JdbcMapperImpl;
 import ru.otus.jdbc.sessionmanager.SessionManagerJdbc;
@@ -17,7 +20,8 @@ public class UserDaoJdbcMapper implements UserDao {
 
     public UserDaoJdbcMapper(SessionManagerJdbc sessionManager, DbExecutorImpl<User> dbExecutor) throws NoSuchMethodException {
         this.sessionManager = sessionManager;
-        jdbcMapper = new JdbcMapperImpl<>(User.class, sessionManager, dbExecutor);
+        jdbcMapper = new JdbcMapperImpl<>(sessionManager, dbExecutor,
+                new EntityClassMetaDataImpl<>(User.class), new EntitySQLMetaDataImpl<>(User.class));
     }
 
     @Override
