@@ -24,7 +24,9 @@ import java.util.stream.IntStream;
 public class CacheDemo {
     private static final Logger logger = LoggerFactory.getLogger(CacheDemo.class);
 
-    private DBServiceUser dbServiceUser;
+    private final DBServiceUser dbServiceUser;
+    private final HwCache<String, User> myCache;
+    private final HwListener<String, User> cacheEventListener;
 
     public static void main(String[] args) throws InterruptedException {
         CacheDemo demo = new CacheDemo();
@@ -35,20 +37,20 @@ public class CacheDemo {
         SessionFactory sessionFactory = HibernateUtils.buildSessionFactory("hibernate.cfg.xml",
                 User.class, Address.class, Phone.class);
         SessionManagerHibernate sessionManager = new SessionManagerHibernate(sessionFactory);
-        dbServiceUser = new DbServiceUserImpl(new UserDaoHibernate(sessionManager));
-    }
-
-    private void runDemo() throws InterruptedException {
 
         // cache init
-        HwCache<String, User> myCache = new MyCache<>();
-        HwListener<String, User> listener = new HwListener<String, User>() {
+        myCache = new MyCache<>();
+        cacheEventListener = new HwListener<String, User>() {
             @Override
             public void notify(String key, User value, String action) {
                 logger.info("MyCache: key:{}, value:{}, action: {}", key, value, action);
             }
         };
-        myCache.addListener(listener);
+        myCache.addListener(cacheEventListener);
+        dbServiceUser = new DbServiceUserImpl(new UserDaoHibernate(sessionManager), myCache);
+    }
+
+    private void runDemo() throws InterruptedException {
 
         // load random data
         long[] userIds = new long[10];
@@ -65,13 +67,13 @@ public class CacheDemo {
         // 1-st round for cache warming
         logger.info("=========== with cache - 1, cache warming ==============");
         for (long id : userIds) {
-            User user = getWithCache(id, myCache);
+            User user = dbServiceUser.getUserWithCache(id);
             logger.info("loaded user: {}", user);
         }
         // 2-nd round for cache work demo
         logger.info("=========== with cache - 2, with warm cache ==============");
         for (long id : userIds) {
-            User user = getWithCache(id, myCache);
+            User user = dbServiceUser.getUserWithCache(id);
             logger.info("loaded user: {}", user);
         }
 
@@ -82,29 +84,16 @@ public class CacheDemo {
             references.add(new SoftReference<>(new BigObject()));
         }
 
-        //System.gc();
-        //Thread.sleep(1000);
         logger.info("after gc, cache size: {}", myCache.size());
 
         // 3-rd round for check cache clear
         logger.info("=========== with cache - 3, after cache clear ==============");
         for (long id : userIds) {
-            User user = getWithCache(id, myCache);
+            User user = dbServiceUser.getUserWithCache(id);
             logger.info("loaded user: {}", user);
         }
-    }
 
-    private User getWithCache(long id, HwCache<String, User> myCache) {
-        String key = "key" + id;
-        User user = myCache.get(key);
-        if (user == null) {
-            Optional<User> userOptional = dbServiceUser.getUser(id);
-            if (userOptional.isPresent()) {
-                user = userOptional.get();
-                myCache.put(key, user);
-            }
-        }
-        return user;
+        myCache.removeListener(cacheEventListener);
     }
 
     private User createRandomUser() {
