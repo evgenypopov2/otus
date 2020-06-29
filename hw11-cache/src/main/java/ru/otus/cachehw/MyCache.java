@@ -30,20 +30,9 @@ public class MyCache<K, V> implements HwCache<K, V> {
     @Override
     public void put(K key, V value) {
         if (cacheMap.size() == CACHE_MAX_SIZE) {
-            K keyToRemove = null;
-            Date minTime = new Date();
-            // find earliest
-            for (Map.Entry<K, ValueWrapper<V>> element : cacheMap.entrySet()) {
-                if (element.getValue().time.before(minTime)) {
-                    minTime = element.getValue().time;
-                    keyToRemove = element.getKey();
-                }
-            }
+            K keyToRemove = getTheEarliestKey();
             if (keyToRemove == null) {  // if nothing found then remove first
-                Iterator<K> iterator = cacheMap.keySet().iterator();
-                if (iterator.hasNext()) {
-                    keyToRemove = iterator.next();
-                }
+                keyToRemove = getFirstKey();
             }
             if (keyToRemove != null) {
                 cacheMap.remove(keyToRemove);
@@ -99,5 +88,27 @@ public class MyCache<K, V> implements HwCache<K, V> {
             value = valueWrapper.value;
         }
         return value;
+    }
+
+    private K getTheEarliestKey() {
+        K theEarliestKey = null;
+        Date minTime = new Date();
+        // find earliest
+        for (Map.Entry<K, ValueWrapper<V>> element : cacheMap.entrySet()) {
+            if (element.getValue().time.before(minTime)) {
+                minTime = element.getValue().time;
+                theEarliestKey = element.getKey();
+            }
+        }
+        return theEarliestKey;
+    }
+
+    private K getFirstKey() {
+        K firstKey = null;
+        Iterator<K> iterator = cacheMap.keySet().iterator();
+        if (iterator.hasNext()) {
+            firstKey = iterator.next();
+        }
+        return firstKey;
     }
 }

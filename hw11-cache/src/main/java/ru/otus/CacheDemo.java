@@ -24,7 +24,7 @@ import java.util.stream.IntStream;
 public class CacheDemo {
     private static final Logger logger = LoggerFactory.getLogger(CacheDemo.class);
 
-    private final DBServiceUser dbServiceUser;
+    private final DbServiceUserImplWithCache dbServiceUser;
     private final HwCache<String, User> myCache;
     private final HwListener<String, User> cacheEventListener;
 
@@ -47,7 +47,7 @@ public class CacheDemo {
             }
         };
         myCache.addListener(cacheEventListener);
-        dbServiceUser = new DbServiceUserImpl(new UserDaoHibernate(sessionManager), myCache);
+        dbServiceUser = new DbServiceUserImplWithCache(new UserDaoHibernate(sessionManager), myCache);
     }
 
     private void runDemo() throws InterruptedException {

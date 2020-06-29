@@ -9,7 +9,6 @@ public interface DBServiceUser {
     long saveUser(User user);
 
     Optional<User> getUser(long id);
-    User getUserWithCache(long id);
 
     void deleteUser(User user);
 }
