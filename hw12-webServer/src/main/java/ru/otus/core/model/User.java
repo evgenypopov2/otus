@@ -22,11 +22,11 @@ public class User {
     private String password;
 
     /*@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Phone> phones = new ArrayList<>();
+    private List<Phone> phones = new ArrayList<>();*/
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
-    private Address address;*/
+    private Address address;
 
     public User() {
     }
@@ -75,7 +75,7 @@ public class User {
 
     public void setPhones(List<Phone> phones) {
         this.phones = phones;
-    }
+    }*/
 
     public Address getAddress() {
         return address;
@@ -84,19 +84,19 @@ public class User {
     public void setAddress(Address address) {
         address.setUser(this);
         this.address = address;
-    }*/
+    }
 
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                /*", address='" + address + '\'' +
-                ", phones=" + phones +*/
+                ", address='" + address + '\'' +
+                /*", phones=" + phones +*/
                 '}';
     }
 
-    /*public void addAddress(Address address) {
+    public void addAddress(Address address) {
         address.setUser(this);
         this.address = address;
     }
@@ -107,7 +107,8 @@ public class User {
             this.address = null;
         }
     }
-    public void addPhone(Phone phone) {
+
+    /*public void addPhone(Phone phone) {
         phone.setUser(this);
         this.phones.add(phone);
     }*/

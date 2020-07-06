@@ -1,5 +1,6 @@
 package ru.otus.servlet;
 
+import ru.otus.core.model.Address;
 import ru.otus.core.model.User;
 import ru.otus.core.service.DBServiceUser;
 import ru.otus.services.TemplateProcessor;
@@ -30,6 +31,7 @@ public class UsersServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse response) throws IOException {
 
         List<User> userList = dbServiceUser.getUserList();
+        userList.forEach(user -> user.setAddress(user.getAddress() == null ? new Address("",user) : user.getAddress()));
         Map<String, Object> paramsMap = new HashMap<>();
         paramsMap.put(TEMPLATE_ATTR_USER_LIST, userList);
 

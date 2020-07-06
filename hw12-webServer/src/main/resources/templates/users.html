@@ -1,4 +1,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
+<style type="text/css">
+    table {
+        border: 1px black solid; /* стиль внешней рамки */
+    }
+    td {
+        border: 1px black solid; /* стиль рамки ячеек */
+    }
+    th {
+        border: 1px black solid; /* стиль рамки заголовков */
+    }
+</style>
 <head>
     <title>Пользователи</title>
     <script>
@@ -13,13 +24,14 @@
 <button onclick="createUser()">Создать пользователя</button>
 
 <h4>Список пользователей</h4>
-<table style="width: 400px">
+<table style="width: 80%">
     <thead>
         <tr>
             <td style="width: 50px">Id</td>
             <td style="width: 300px">Имя</td>
             <td style="width: 100px">Логин</td>
             <td style="width: 100px">Пароль</td>
+            <td style="width: 500px">Адрес</td>
         </tr>
     </thead>
     <tbody>
@@ -30,6 +42,7 @@
                     <td>${user.name}</td>
                     <td>${user.login}</td>
                     <td>${user.password}</td>
+                    <td>${user.address.street}</td>
                 </tr>
             </#items>
         </#list>

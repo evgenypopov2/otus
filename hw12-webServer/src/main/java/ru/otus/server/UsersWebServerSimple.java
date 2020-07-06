@@ -11,7 +11,6 @@ import ru.otus.core.service.DBServiceUser;
 import ru.otus.helpers.FileSystemHelper;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.servlet.CreateUserServlet;
-import ru.otus.servlet.UsersApiServlet;
 import ru.otus.servlet.UsersServlet;
 
 public class UsersWebServerSimple implements UsersWebServer {
@@ -56,7 +55,7 @@ public class UsersWebServerSimple implements UsersWebServer {
         HandlerList handlers = new HandlerList();
         handlers.addHandler(resourceHandler);
         handlers.addHandler(applySecurity(servletContextHandler,
-                "/users", "/api/user/*", "/user"));
+                "/users", "/user"));
 
         server.setHandler(handlers);
         return server;
@@ -77,7 +76,6 @@ public class UsersWebServerSimple implements UsersWebServer {
     private ServletContextHandler createServletContextHandler() {
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
         servletContextHandler.addServlet(new ServletHolder(new UsersServlet(templateProcessor, dbServiceUser)), "/users");
-        servletContextHandler.addServlet(new ServletHolder(new UsersApiServlet(dbServiceUser, gson)), "/api/user/*");
         servletContextHandler.addServlet(new ServletHolder(new CreateUserServlet(templateProcessor, dbServiceUser)), "/user");
         return servletContextHandler;
     }

@@ -1,10 +1,10 @@
 package ru.otus.servlet;
 
+import ru.otus.core.model.Address;
 import ru.otus.core.model.User;
 import ru.otus.core.service.DBServiceUser;
 import ru.otus.services.TemplateProcessor;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +15,7 @@ public class CreateUserServlet extends HttpServlet {
     private static final String PARAM_NAME = "name";
     private static final String PARAM_LOGIN = "login";
     private static final String PARAM_PASSWORD = "password";
+    private static final String PARAM_ADDRESS = "address";
     private static final String USER_PAGE_TEMPLATE = "user.html";
 
     private final TemplateProcessor templateProcessor;
@@ -36,8 +37,11 @@ public class CreateUserServlet extends HttpServlet {
         String name = request.getParameter(PARAM_NAME);
         String login = request.getParameter(PARAM_LOGIN);
         String password = request.getParameter(PARAM_PASSWORD);
+        String address = request.getParameter(PARAM_ADDRESS);
 
-        dbServiceUser.saveUser(new User(name, login, password));
+        User user = new User(name, login, password);
+        user.setAddress(new Address(address, user));
+        dbServiceUser.saveUser(user);
         response.sendRedirect("/users");
     }
 
