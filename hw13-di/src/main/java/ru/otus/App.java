@@ -3,6 +3,8 @@ package ru.otus;
 import ru.otus.appcontainer.AppComponentsContainerImpl;
 import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.config.AppConfig;
+import ru.otus.config.AppConfig1;
+import ru.otus.config.AppConfig2;
 import ru.otus.services.GameProcessor;
 
 /*
@@ -16,7 +18,19 @@ PS Приложение представляет из себя тренажер 
 public class App {
 
     public static void main(String[] args) throws Exception {
-        AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig.class);
+
+        // single config
+        /*AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig.class);
+        GameProcessor gameProcessor = container.getAppComponent(GameProcessor.class);
+        //GameProcessor gameProcessor = container.getAppComponent("gameProcessor");*/
+
+        // several configs
+        /*AppComponentsContainer container = new AppComponentsContainerImpl(AppConfig2.class, AppConfig1.class);
+        GameProcessor gameProcessor = container.getAppComponent(GameProcessor.class);
+        //GameProcessor gameProcessor = container.getAppComponent("gameProcessor");*/
+
+        // package config
+        AppComponentsContainer container = new AppComponentsContainerImpl("ru.otus.config");
         GameProcessor gameProcessor = container.getAppComponent(GameProcessor.class);
         //GameProcessor gameProcessor = container.getAppComponent("gameProcessor");
 

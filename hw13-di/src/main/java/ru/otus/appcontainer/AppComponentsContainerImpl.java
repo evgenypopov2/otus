@@ -1,5 +1,10 @@
 package ru.otus.appcontainer;
 
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 import ru.otus.appcontainer.api.AppComponent;
 import ru.otus.appcontainer.api.AppComponentsContainer;
 import ru.otus.appcontainer.api.AppComponentsContainerConfig;
@@ -7,17 +12,46 @@ import ru.otus.appcontainer.api.AppComponentsContainerConfig;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AppComponentsContainerImpl implements AppComponentsContainer {
 
     private final List<Object> appComponents = new ArrayList<>();
     private final Map<String, Object> appComponentsByName = new HashMap<>();
 
+    private static class ScannedAppConfigMethod {
+        String name;
+        Method method;
+        private ScannedAppConfigMethod(String name, Method method) {
+            this.name = name;
+            this.method = method;
+        }
+    }
+
     public AppComponentsContainerImpl(Class<?> initialConfigClass) throws InvocationTargetException, IllegalAccessException,
             NoSuchMethodException, InstantiationException {
 
         processConfig(initialConfigClass);
     }
+
+    public AppComponentsContainerImpl(Class<?>... initialConfigClasses) throws InvocationTargetException, IllegalAccessException,
+            NoSuchMethodException, InstantiationException {
+
+        processConfig(initialConfigClasses);
+    }
+
+    public AppComponentsContainerImpl(String configPackage) throws InvocationTargetException, IllegalAccessException,
+            NoSuchMethodException, InstantiationException {
+
+        Reflections reflections = new Reflections(new ConfigurationBuilder()
+                .setUrls(ClasspathHelper.forPackage(configPackage))
+                .setScanners(new TypeAnnotationsScanner(), new SubTypesScanner()));
+
+        processConfig(new ArrayList<>(reflections.getTypesAnnotatedWith(AppComponentsContainerConfig.class)));
+    }
+
+    //==================================
 
     private void processConfig(Class<?> configClass) throws InvocationTargetException, IllegalAccessException,
             NoSuchMethodException, InstantiationException {
@@ -26,26 +60,41 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
         fillAppComponentLists(scanAppConfigMethods(configClass), configClass.getConstructor().newInstance());
     }
 
-    private Map<Integer, Map<String, Method>> scanAppConfigMethods(Class<?> configClass) {
-        Map<Integer, Map<String, Method>> result = new TreeMap<>();
+    private void processConfig(Class<?>[] configClasses) throws InvocationTargetException, IllegalAccessException,
+            NoSuchMethodException, InstantiationException {
 
-        for (Method method : configClass.getMethods()) {
-            AppComponent appComponentAnnotation = method.getDeclaredAnnotation(AppComponent.class);
-            if (appComponentAnnotation != null) {
-                result.computeIfAbsent(appComponentAnnotation.order(), k -> new HashMap<>()).put(appComponentAnnotation.name(), method);
-            }
-        }
-        return result;
+        processConfig(Stream.of(configClasses).peek(this::checkConfigClass).collect(Collectors.toList()));
     }
 
-    private void fillAppComponentLists(Map<Integer, Map<String, Method>> allMethodsMap, Object configObject)
+    private void processConfig(List<Class<?>> configClasses) throws InvocationTargetException, IllegalAccessException,
+            NoSuchMethodException, InstantiationException {
+
+        configClasses = configClasses.stream()
+                .sorted(Comparator.comparingInt(c -> c.getDeclaredAnnotation(AppComponentsContainerConfig.class).order()))
+                .collect(Collectors.toList());
+
+        for (Class<?> configClass: configClasses) {
+            processConfig(configClass);
+        }
+    }
+
+    //==================================
+
+    private List<ScannedAppConfigMethod> scanAppConfigMethods(Class<?> configClass) {
+        return Stream.of(configClass.getMethods()).filter(method -> method.getDeclaredAnnotation(AppComponent.class) != null)
+                .sorted(Comparator.comparingInt(m -> m.getDeclaredAnnotation(AppComponent.class).order()))
+                .map(m -> new ScannedAppConfigMethod(m.getDeclaredAnnotation(AppComponent.class).name(), m))
+                .collect(Collectors.toList());
+    }
+
+    private void fillAppComponentLists(List<ScannedAppConfigMethod> scannedAppConfigMethods, Object configObject)
             throws InvocationTargetException, IllegalAccessException {
 
-        for (Map<String, Method> methodMap: allMethodsMap.values()) {
-            for (Map.Entry<String, Method> methodEntry: methodMap.entrySet()) {
-                Object appComponent = createAppComponent(configObject, methodEntry.getValue());
+        for (ScannedAppConfigMethod method: scannedAppConfigMethods) {
+            if (appComponentsByName.get(method.name) == null) {
+                Object appComponent = createAppComponent(configObject, method.method);
                 appComponents.add(appComponent);
-                appComponentsByName.put(methodEntry.getKey(), appComponent);
+                appComponentsByName.put(method.name, appComponent);
             }
         }
     }
