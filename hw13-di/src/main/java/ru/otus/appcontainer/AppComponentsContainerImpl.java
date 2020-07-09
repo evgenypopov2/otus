@@ -63,13 +63,14 @@ public class AppComponentsContainerImpl implements AppComponentsContainer {
     private void processConfig(Class<?>[] configClasses) throws InvocationTargetException, IllegalAccessException,
             NoSuchMethodException, InstantiationException {
 
-        processConfig(Stream.of(configClasses).peek(this::checkConfigClass).collect(Collectors.toList()));
+        processConfig(Arrays.asList(configClasses));
     }
 
     private void processConfig(List<Class<?>> configClasses) throws InvocationTargetException, IllegalAccessException,
             NoSuchMethodException, InstantiationException {
 
         configClasses = configClasses.stream()
+                .peek(this::checkConfigClass)
                 .sorted(Comparator.comparingInt(c -> c.getDeclaredAnnotation(AppComponentsContainerConfig.class).order()))
                 .collect(Collectors.toList());
 
