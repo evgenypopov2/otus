@@ -19,9 +19,6 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    /*@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Phone> phones = new ArrayList<>();*/
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
@@ -67,14 +64,6 @@ public class User {
         this.name = name;
     }
 
-    /*public List<Phone> getPhones() {
-        return phones;
-    }
-
-    public void setPhones(List<Phone> phones) {
-        this.phones = phones;
-    }*/
-
     public Address getAddress() {
         return address;
     }
@@ -94,21 +83,10 @@ public class User {
                 '}';
     }
 
-    public void addAddress(Address address) {
-        address.setUser(this);
-        this.address = address;
-    }
-
     public void removeAddress() {
         if (address != null) {
             address.setUser(null);
             this.address = null;
         }
     }
-
-    /*public void addPhone(Phone phone) {
-        phone.setUser(this);
-        this.phones.add(phone);
-    }*/
-
 }

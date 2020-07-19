@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping("/create")
     public String userCreateView(Model model) {
         User user = new User();
-        user.addAddress(new Address("", user));
+        user.setAddress(new Address("", user));
         model.addAttribute("user", user);
         return "user.html";
     }
