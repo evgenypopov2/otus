@@ -51,6 +51,7 @@ allprojects {
             force("org.codehaus.jackson:jackson-core-asl:1.8.8")
             force("org.codehaus.jackson:jackson-mapper-asl:1.8.3")
             force("org.codehaus.jettison:jettison:1.1")
+            force("org.javassist:javassist:3.24.0-GA")
         }
     }
 }

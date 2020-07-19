@@ -1,0 +1,49 @@
+<html  lang="en" xmlns:th="http://www.thymeleaf.org">
+<style type="text/css">
+    table {
+        border: 1px black solid; /* стиль внешней рамки */
+    }
+    td {
+        border: 1px black solid; /* стиль рамки ячеек */
+    }
+    th {
+        border: 1px black solid; /* стиль рамки заголовков */
+    }
+</style>
+<head>
+    <title>Пользователи</title>
+    <script>
+        function createUser() {
+            window.location.href = "/user/create"
+        }
+    </script>
+</head>
+
+<body>
+<img src="static/logo.svg" style="width: 100px; height: 100px">
+<h3>Список пользователей</h3>
+<button onclick="createUser()">Создать пользователя</button>
+<div><br/></div>
+
+<table style="width: 80%">
+    <thead>
+        <tr>
+            <td style="width: 50px">Id</td>
+            <td style="width: 300px">Имя</td>
+            <td style="width: 100px">Логин</td>
+            <td style="width: 100px">Пароль</td>
+            <td style="width: 500px">Адрес</td>
+        </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.login}"></td>
+        <td th:text="${user.password}"></td>
+        <td th:text="${user.address.street}"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
