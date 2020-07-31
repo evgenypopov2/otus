@@ -10,13 +10,18 @@ public class ExecutorServiceNumbers {
     private static final int MAX_NUMBER = 10;
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceNumbers.class);
 
+    static int threadId = 2;
+    static ExecutorServiceNumbers executor;
+
     static class Task implements Runnable {
         private final int id;
         int counter = 0;
         int increment = 1;
+
         public Task(int id) {
             this.id = id;
         }
+
         @Override
         public void run() {
             for (int i = 0; i < Integer.MAX_VALUE; i++) {
@@ -26,25 +31,33 @@ public class ExecutorServiceNumbers {
                     counter += 2 * increment;
                 }
                 logger.info("{}", counter);
-                sleep(1000);
+                executor.switchThread(id);
             }
         }
     }
 
     public static void main(String[] args) {
+        executor = new ExecutorServiceNumbers();
+        executor.execute();
+    }
+
+    public void execute() {
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.submit(new Task(1));
-        sleep(500);
         executor.submit(new Task(2));
     }
 
-    private static void sleep(int delay) {
+    public synchronized void switchThread(int nextThreadId) {
         try {
-            Thread.sleep(delay);
+            while (threadId == nextThreadId) {
+                wait();
+            }
+            threadId = nextThreadId;
+            Thread.sleep(500);
+            notifyAll();
         } catch (InterruptedException e) {
             logger.error(e.getMessage());
             Thread.currentThread().interrupt();
         }
     }
-
 }
