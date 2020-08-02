@@ -1,0 +1,58 @@
+﻿<html lang="en" content="text/html;">
+<head>
+    <title>Create user</title>
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/app.js"></script>
+    <script>
+        const saveUser = () => {
+            let user = {
+                name: $('#name').val(),
+                login: $('#login').val(),
+                password: $('#password').val(),
+                address: $('#address').val()
+            };
+            window.stompClient.send("/users/save", {}, JSON.stringify(user));
+        };
+        $(function () {
+            //window.stompClient.disconnect();
+            connect(() => {
+                window.stompClient.subscribe('/usersaved', (user) => {
+                    window.stompClient.disconnect();
+                    window.location.href = "/";
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="top">
+    <img src="/createUser.png" style="width: 100px; height: 100px">
+    <h3>Создать пользователя</h3>
+    <form onsubmit="saveUser();" accept-charset="utf-8">
+        <label>
+            Name:<br/>
+            <input type="text" id="name">
+        </label>
+        <br/>
+        <label>
+            Login:<br/>
+            <input type="text" id="login">
+        </label>
+        <br/>
+        <label>
+            Password:<br/>
+            <input type="password" id="password">
+        </label>
+        <br/>
+        <label>
+            Address:<br/>
+            <input type="text" id="address">
+        </label>
+        <br/><br/>
+        <button type="submit">OK</button>
+    </form>
+</div>
+</body>
+</html>
