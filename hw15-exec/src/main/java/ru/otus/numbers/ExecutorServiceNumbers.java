@@ -11,7 +11,7 @@ public class ExecutorServiceNumbers {
     private static final Logger logger = LoggerFactory.getLogger(ExecutorServiceNumbers.class);
 
     static int threadId = 2;
-    static ExecutorServiceNumbers executor;
+    static ExecutorServiceNumbers executorServiceNumbers;
 
     static class Task implements Runnable {
         private final int id;
@@ -31,20 +31,17 @@ public class ExecutorServiceNumbers {
                     counter += 2 * increment;
                 }
                 logger.info("{}", counter);
-                executor.switchThread(id);
+                executorServiceNumbers.switchThread(id);
             }
         }
     }
 
     public static void main(String[] args) {
-        executor = new ExecutorServiceNumbers();
-        executor.execute();
-    }
+        executorServiceNumbers = new ExecutorServiceNumbers();
 
-    public void execute() {
-        ExecutorService executor = Executors.newFixedThreadPool(2);
-        executor.submit(new Task(1));
-        executor.submit(new Task(2));
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        executorService.submit(new Task(1));
+        executorService.submit(new Task(2));
     }
 
     public synchronized void switchThread(int nextThreadId) {
