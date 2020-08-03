@@ -10,6 +10,7 @@ import ru.otus.messagesystem.message.MessageBuilder;
 import ru.otus.messagesystem.message.MessageType;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class MsClientImpl implements MsClient {
     private static final Logger logger = LoggerFactory.getLogger(MsClientImpl.class);
@@ -58,9 +59,9 @@ public class MsClientImpl implements MsClient {
     }
 
     @Override
-    public <T extends ResultDataType> Message produceMessage(String to, T data, MessageType msgType,
+    public <T extends ResultDataType> Message produceMessage(UUID requestId, String to, T data, MessageType msgType,
                                                              MessageCallback<T> callback) {
-        Message message = MessageBuilder.buildMessage(name, to, null, data, msgType);
+        Message message = MessageBuilder.buildMessage(requestId, name, to, null, data, msgType);
         callbackRegistry.put(message.getCallbackId(), callback);
         return message;
     }

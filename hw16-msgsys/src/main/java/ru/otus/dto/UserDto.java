@@ -2,6 +2,8 @@ package ru.otus.dto;
 
 import ru.otus.messagesystem.client.ResultDataType;
 
+import java.util.UUID;
+
 public class UserDto extends ResultDataType {
     private long id;
     private String name;
@@ -10,7 +12,8 @@ public class UserDto extends ResultDataType {
     private String address;
 
     public UserDto() {}
-    public UserDto(long id, String name, String login, String password, String address) {
+    public UserDto(UUID requestId, long id, String name, String login, String password, String address) {
+        setRequestId(requestId);
         this.id = id;
         this.name = name;
         this.login = login;

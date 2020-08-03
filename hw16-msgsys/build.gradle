@@ -17,6 +17,7 @@ dependencies {
     implementation("org.webjars:sockjs-client:${Versions.sockjs}")
     implementation("org.webjars:stomp-websocket:${Versions.stomp}")
     implementation("org.webjars:bootstrap:${Versions.bootstrap}")
+    implementation("org.webjars:uuid:1.4.1")
 
     implementation("ch.qos.logback:logback-classic")
     implementation("com.google.code.gson:gson:${Versions.gson}")

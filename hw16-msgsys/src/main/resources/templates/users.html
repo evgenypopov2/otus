@@ -15,6 +15,7 @@
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+    <script src="/webjars/uuid/uuid.js"></script>
     <script src="/app.js"></script>
     <script>
         const drawUserTable = (userData) => {
@@ -34,12 +35,13 @@
             window.location.href = "/users/create"
         }
         $(function () {
-            //window.stompClient.disconnect();
             connect(() => {
-                window.stompClient.subscribe('/userlist', (userList) => {
+                let requestId = uuid.v4();
+                window.stompClient.subscribe('/userlist.' + requestId, (userList) => {
                     drawUserTable(JSON.parse(userList.body));
                 });
-                window.stompClient.send("/users/list", {}, JSON.stringify({'messageStr': 'give me user list please'}));
+                window.stompClient.send("/users/list", {requestId: requestId},
+                    JSON.stringify({'messageStr': 'give me user list please'}));
             });
         });
     </script>

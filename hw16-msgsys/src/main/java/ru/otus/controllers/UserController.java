@@ -1,5 +1,8 @@
 package ru.otus.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -17,12 +20,15 @@ import ru.otus.messagesystem.client.MsClientImpl;
 import ru.otus.messagesystem.message.Message;
 import ru.otus.messagesystem.message.MessageType;
 
+import java.util.UUID;
+
 
 @Controller
 public class UserController {
 
     private static final String DATABASE_SERVICE_CLIENT_NAME = "databaseService";
     private static final String FRONTEND_SERVICE_CLIENT_NAME = "frontendService";
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private SimpMessagingTemplate template;
 
@@ -57,24 +63,25 @@ public class UserController {
     }
 
     @MessageMapping("/list")
-    public void getUsers(String message) {
-        Message outMsg = frontendMsClient.produceMessage(DATABASE_SERVICE_CLIENT_NAME, null,
+    public void getUsers(@Header("requestId") UUID requestId, String message) {
+        Message outMsg = frontendMsClient.produceMessage(requestId, DATABASE_SERVICE_CLIENT_NAME, null,
                 MessageType.GET_USERS_DATA, this::returnUserList);
         frontendMsClient.sendMessage(outMsg);
     }
 
     @MessageMapping("/save")
-    public void saveUser(UserDto userDto) {
-        Message outMsg = frontendMsClient.produceMessage(DATABASE_SERVICE_CLIENT_NAME, userDto,
+    public void saveUser(@Header("requestId") UUID requestId, UserDto userDto) {
+        Message outMsg = frontendMsClient.produceMessage(requestId, DATABASE_SERVICE_CLIENT_NAME, userDto,
                 MessageType.PUT_USER_DATA, this::returnSavedUser);
         frontendMsClient.sendMessage(outMsg);
     }
 
     public void returnUserList(ResultDataTypeUserList resultDataTypeUserList) {
-        template.convertAndSend("/userlist", resultDataTypeUserList.getUserList());
+        template.convertAndSend("/userlist." + resultDataTypeUserList.getRequestId().toString(),
+                resultDataTypeUserList.getUserList());
     }
 
     public void returnSavedUser(UserDto userDto) {
-        template.convertAndSend("/usersaved", userDto);
+        template.convertAndSend("/usersaved." + userDto.getRequestId().toString(), userDto);
     }
 }

@@ -6,10 +6,12 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private final UUID requestId;
     private final MessageId id;
     private final String from;
     private final String to;
@@ -18,9 +20,10 @@ public class Message implements Serializable {
     private final byte[] payload;
     private final CallbackId callbackId;
 
-    Message(MessageId messageId, String from, String to, MessageId sourceMessageId, String type,
+    Message(MessageId messageId, UUID requestId, String from, String to, MessageId sourceMessageId, String type,
             byte[] payload, CallbackId callbackId) {
         this.id = messageId;
+        this.requestId = requestId;
         this.from = from;
         this.to = to;
         this.sourceMessageId = sourceMessageId;
@@ -35,6 +38,7 @@ public class Message implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         Message message = (Message) o;
         return Objects.equals(id, message.id) &&
+                Objects.equals(requestId, message.requestId) &&
                 Objects.equals(from, message.from) &&
                 Objects.equals(to, message.to) &&
                 Objects.equals(sourceMessageId, message.sourceMessageId) &&
@@ -45,7 +49,7 @@ public class Message implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(id, from, to, sourceMessageId, type, callbackId);
+        int result = Objects.hash(id, requestId, from, to, sourceMessageId, type, callbackId);
         result = 31 * result + Arrays.hashCode(payload);
         return result;
     }
@@ -54,6 +58,7 @@ public class Message implements Serializable {
     public String toString() {
         return "Message{" +
                 "id=" + id +
+                ", requestId='" + requestId.toString() + '\'' +
                 ", from='" + from + '\'' +
                 ", to='" + to + '\'' +
                 ", sourceMessageId=" + sourceMessageId +
@@ -88,5 +93,9 @@ public class Message implements Serializable {
 
     public Optional<MessageId> getSourceMessageId() {
         return Optional.ofNullable(sourceMessageId);
+    }
+
+    public UUID getRequestId() {
+        return requestId;
     }
 }

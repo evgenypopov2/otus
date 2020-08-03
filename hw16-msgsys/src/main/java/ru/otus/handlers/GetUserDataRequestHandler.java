@@ -21,6 +21,7 @@ import ru.otus.messagesystem.message.MessageType;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -65,22 +66,26 @@ public class GetUserDataRequestHandler implements RequestHandler<UserDto> {
     }
 
     private UserDto getUserData(Message msg) {
-        return dbServiceUser.getUser(MessageHelper.getPayload(msg)).map(this::userDtoFromUser).orElse(null);
+        return dbServiceUser.getUser(MessageHelper.getPayload(msg))
+                .map(user -> userDtoFromUser(user, msg.getRequestId())).orElse(null);
     }
 
     private ResultDataTypeUserList getUserList(Message msg) {
-        return new ResultDataTypeUserList(dbServiceUser.getUserList().stream().map(this::userDtoFromUser).collect(Collectors.toList()));
+        return new ResultDataTypeUserList(msg.getRequestId(),
+                dbServiceUser.getUserList().stream()
+                        .map((user) -> userDtoFromUser(user, msg.getRequestId()))
+                        .collect(Collectors.toList()));
     }
 
     private UserDto putUserData(Message msg) {
         UserDto userDto = MessageHelper.getPayload(msg);
         User user = new User(userDto.getName(), userDto.getLogin(), userDto.getPassword());
         user.setAddress(new Address(userDto.getAddress(), user));
-        return userDtoFromUser(dbServiceUser.saveUser(user));
+        return userDtoFromUser(dbServiceUser.saveUser(user), msg.getRequestId());
     }
 
-    private UserDto userDtoFromUser(User user) {
-        return new UserDto(user.getId(), user.getName(), user.getLogin(), user.getPassword(),
+    private UserDto userDtoFromUser(User user, UUID requestId) {
+        return new UserDto(requestId, user.getId(), user.getName(), user.getLogin(), user.getPassword(),
                 user.getAddress() != null ? user.getAddress().getStreet() : "");
     }
 }
